@@ -2,7 +2,7 @@
 
 In this project, the COVID-shock on the Airbnb-rental market is measured and possible scenarios are forecasted. The main question that needed to be answered is 
 
-### How has the COVID-19 pandemic aected the Airbnb-market in Amsterdam and what are its implications for the future?
+### How has the COVID-19 pandemic affected the Airbnb-market in Amsterdam and what are its implications for the future?
 
 The bigger picture of this project was to define how resilient Airbnb is towards unforeseeable events in its market environment. In order to analyze that, this project focuses on the economic framework of supply and demand by looking at three variables: the price of a listing, its occupancy, and availability. While price is self-explanatory, occupancy
 (the number of bookings per month for example) represents the demand side, while availability (the number of days per month a host makes their location available) represents
