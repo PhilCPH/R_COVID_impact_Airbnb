@@ -119,6 +119,61 @@ As mentioned before, the three independent variables of analysis are linearly co
 
 ![Correlation image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Correlation%20graph.PNG)
 
+### Arima
 
-### Summary:
-This project investigated the  COVID-19 pandemic on the Airbnb rental market in Amsterdam. For that, data sets of the website InsideAirbnb were separately downloaded and merged. Development in demand, price and availability were subject to time series analysis. The results were used to visualize the external shock's influence on the three components. A downwards trend for price and demand were present, however the business model of Airbnb seems to be quite resilient towards external shocks with a short recovery phase especially for rental prices. In case a vaccine is permitted for distribution and travel restrictions are lifted, the market will likely recover to its former performance.
+The ARIMA model enables the description and analysis of time series. Due to the noisiness of the data at hand it was unfortunately not possible to polish the data set to a satisfactory level. Therefore, a different approach was taken with regards to the exploratory analysis and to extend the model's complexity. 
+
+The analysis started with the ARIMA on a global level, meaning aggregated average data was used without distinguishing between different categories (e.g. a specific neighbourhood). For price, an ARIMA with 1st order Auto regression was identified (ARIMA(1,0,0)). The augmented Dickey-Fuller test (ADF) revealed that the data indeed is not stationary and determined a lag order of 3, thus evoking the need to implement stationarity in the auto.arima function. The Ljung-Box test was used to run diagnostics on the analysis and yielded a p-value of p = 0:3681.
+
+For demand, stationarity was also not given and the lag order was 3 again. The resulting ARIMA was of 2nd order Auto regression. Diagnostics were again done with the Ljung-Box test which yielded a p-value of p = 0:5144. Lastly, availability had the same structural pre-requisites, the lag order was again 3. I identified an ARIMA with 1st order Auto regression (ARIMA(1,0,0), the Ljung-Box
+test resulted in a p-value of p = 0:2934. The rather low p-values of the Box-Ljung test already reveal that modeling will not
+yield reliable results. Nevertheless, a prediction of the three variables for the upcoming six months was executed.
+
+![Forecast ARIMA image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/ARIMA.PNG)
+
+It can be deducted from the data, that, without further shocks, price and demand will slowly regain their old levels. 95% Confidence Interval (CI) are substantial in all cases to account for the underlying uncertainty provided by the noise in the data. One can nicely
+depict the counter-movements of demand and price to availability. What is interesting here is that even though demand and price are negatively correlated the model predicts both of them to rise when only looking at the isolated effects.
+
+### VAR
+
+Next, the VAR is implemented to account for the relationship between price, demand and availability. It depicts the concurrent and counter-movements of the respective variables.
+
+![TSP image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Time%20Series%20Plot.PNG)
+
+In accordance to ARIMA, diagnostics revealed that there is indeed no stationarity and that the data has a trend. The data was differentiated once according to the recommended number of differentiation required for stationary analysis. From there on, multiple problems occured. The Akaike Information Critera (AIC) suggested 6 legs, but the resulting value would have been -Ind, indicating a overfitting of the model. Hence, 5 legs were used in order to minimize the AIC. Whereas the diagnostics for serial testing and
+normality testing yielded acceptable results, the roots were unfortunately very high, starting from 0.98. This still complies with the rule of thumb to be smaller than 1, meaning that the VAR is at least stable in a sense that shocks reduce over time. However, any
+interpretations with regards to demand need to be made with caution.
+
+![IRF image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Impulse%20Response%20VAR.PNG)
+
+The cumulative IRF models a positive demand shock. This could be the case e.g. if a vaccination gets approved or the country releasing their travel-ban What makes it difficult for the VAR to properly estimate the results of a shock is that the underlying data with which the VAR was modeled with was already exposed twice to shocks in demand. However, one can also argue that especially that inherent
+characteristic makes it appropriate to model another COVID-19 wave which might hit the Netherlands after Christmas and New Year's Eve. Price responds with a sharp reaction in the opposite direction for two lags, contradicting the findings of the ARIMA, until it changes direction again.
+
+Lastly, it will be interesting to look at the forecast of the VAR model and compare it to the forecast of the ARIMA.
+
+![FC image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Forecast%20VAR.PNG)
+
+Without the externally imposed shock, the forecasts move in similar directions. Demand will slowly rise, together with a slight increase in average price per night. Availability will fluctuate but remain on a similar level.
+
+### Decision Tree
+
+Finally an attempt at modelling variation in Price was made using a regression tree. One of the advantages of regression trees over regular regression comes when subsets of data have different data generating process, which is assumed here with the shocks caused by
+COVID on the market. Two models were constructed to try to look at the determinant of price. As described earlier the first one takes five variables: availability, demand, location, room type, new cases of COVID. In the second one, the month of the year was added in
+order to try to capture possible seasonal effects. For both, the whole data set was divided into a training and testing set, with the conventional 70/30 split.
+
+When the models are fed to R, it was observed that for both, the relevant variables appeared to be room type, availability, and location in that order of importance. One problem of the model being that 61% of the data set population ends up in one end leaf. This implies that not enough determining variables were added to the model.
+
+Finally, looking at the prediction efficiency of the model in regards to the training and the testing data sets again proves the limitation of the model: Here we see that the predicted prices form horizontal lines. The model is too general in its classification to really hold any predictive power.
+
+![Tree image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Regression%20Tree%20Splits.PNG)
+
+![Tree Accuracy image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Accuracy%20of%20Regression%20Tree.PNG)
+
+Contradicting prior research, which suggests that the longer an external shock takes place the longer it will take for the organization to recover, Airbnb proved to be more resilient. The demand for the listings only experiences a sharp drop when strict measures are in place, however as soon as restrictions are lifted the number of listings recover swiftly. This suggests that Airbnb might continue to struggle whilst the pandemic is continuing. Nevertheless, the future prospects for the company post COVID- 19 are optimistic. This could be attributed to the fact that many travellers might see Airbnb as a safer alternative to more crowded hotels and therefore their preferred choice of accommodation.
+
+Due to the vast amount of data that needed to be combined in order to conduct this project, the limits in computational
+power of personal computers really showed. Thus, an amazon web server was set up to run some data heavy parts of the code.
+
+### Summary: 
+First, the VAR is arguably the best model as it allows shock implementation and forecasting at the same time. Especially insightful is the comparison of shock data to forecast prediction: a shock in demand leads to short-term changes in price, but the cumulative effect will even out to zero again. Hence, the rent remains, on a long term basis, rather stable after shock situations. Furthermore, the
+VAR model appeared to be the most stable of the three and the most efficient as the ARIMA models' Ljung test proved that result might not be too reliable and the decision tree's predicting power appear to be too superficial. Forecasting future demand, price development and availability given regular travel conditions revealed that demand and price may actually counteract economic intuition as both are expected to rise. This may stem from the fact that the formerly endogenous variable of demand was externalized by the Dutch government's decision to impose strict travel bans. Market mechanisms will probably work again as soon as demand has recovered to its former level. Overall, the preceding study succeeded in capturing the impact of the global coronavirus pandemic on Airbnb's market in Amsterdam and revealed a largely negative impact of case numbers on the three variables. Nevertheless, the company's strong resilience to external shocks in its market environment make it seem likely that as soon as the global travel restrictions are lifted again, Airbnb can continue its success story.
