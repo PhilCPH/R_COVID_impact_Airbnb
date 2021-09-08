@@ -12,6 +12,7 @@ This theory of supply and demand states that if demand exceeds supply, the price
 one assumption related to the study's research question is that a decrease in bookings on Airbnb's website due to global travel restrictions will result in an oversupply of available accommodation and thus cause listing prices to go down.
 
 Next, the step-by-step process is defined 
+
 ![Step-by-step image](https://raw.githubusercontent.com/PhilCPH/R_COVID_impact_Airbnb/main/pics/Plan.PNG)
 
 ## Used datasets
