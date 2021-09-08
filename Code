@@ -1,0 +1,1241 @@
+#Load libraries
+library(tidyverse)
+library(magrittr)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(gridExtra)
+library(forecast)
+library(urca)
+library(vars)
+library(rpart)
+library(rpart.plot)
+
+#Price Manipulation
+#Year 2018
+calendar0418 <- read_csv("calendar0418.csv")
+calendar0518 <- read_csv("calendar0518.csv",col_types = cols("price" = col_character()))
+calendar0618 <- read_csv("calendar0618.csv")
+calendar0718 <- read_csv("calendar0718.csv")
+calendar0818 <- read_csv("calendar0818.csv")
+calendar0918 <- read_csv("calendar0918.csv")
+calendar1018 <- read_csv("calendar1018.csv")
+calendar1118 <- read_csv("calendar1118.csv")
+calendar1218 <-read_csv("calendar1218.csv")
+
+calendar0418 <- calendar0418 %>%
+filter(date >= as.Date("2018-04-07") & date < as.Date("2018-05-10"))
+calendar0518 <- calendar0518 %>%
+filter(date >= as.Date("2018-05-10") & date < as.Date("2018-06-06"))
+calendar0618 <- calendar0618 %>%
+filter(date >= as.Date("2018-06-06") & date < as.Date("2018-07-06"))
+calendar0718 <- calendar0718 %>%
+filter(date >= as.Date("2018-07-06") & date < as.Date("2018-08-07"))
+calendar0818 <- calendar0818 %>%
+filter(date >= as.Date("2018-08-07") & date < as.Date("2018-09-08"))
+calendar0918 <- calendar0918 %>%
+filter(date >= as.Date("2018-09-08") & date < as.Date("2018-10-05"))
+calendar1018 <- calendar1018 %>%
+filter(date >= as.Date("2018-10-05") & date < as.Date("2018-11-04"))
+calendar1118 <- calendar1118 %>%
+filter(date >= as.Date("2018-11-04") & date < as.Date("2018-12-06"))
+calendar1218 <- calendar1218 %>%
+filter(date >= as.Date("2018-12-06") & date < as.Date("2019-01-13"))
+
+calendar2018 <- rbind(calendar0418,calendar0518,calendar0618,calendar0718,calendar0818,calendar0918,calendar1018,calendar1118, calendar1218)
+
+rm(calendar0418,calendar0518,calendar0618,calendar0718,calendar0818,calendar0918,calendar1018,calendar1118,calendar1218)
+
+object.size(calendar2018)
+
+calendar2018 <- calendar2018[, c('listing_id','date', 'price')]
+
+#Year 2019
+calendar0119 <- read_csv("calendar0119.csv")
+calendar0219 <- read_csv("calendar0219.csv")
+calendar0319 <- read_csv("calendar0319.csv")
+calendar0419 <- read_csv("calendar0419.csv")
+calendar0519 <- read_csv("calendar0519.csv")
+calendar0619 <- read_csv("calendar0619.csv")
+calendar0719 <- read_csv("calendar0719.csv")
+calendar0819 <- read_csv("calendar0819.csv")
+calendar0919 <- read_csv("calendar0919.csv")
+calendar1019 <- read_csv("calendar1019.csv")
+calendar1119 <- read_csv("calendar1119.csv")
+calendar1219 <-read_csv("calendar1219.csv")
+
+calendar0119 <- calendar0119 %>%
+filter(date >= as.Date("2019-01-13") & date < as.Date("2019-02-04"))
+calendar0219 <- calendar0219 %>%
+filter(date >= as.Date("2019-02-04") & date < as.Date("2019-03-07"))
+calendar0319 <- calendar0319 %>%
+filter(date >= as.Date("2019-03-07") & date < as.Date("2019-04-08"))
+calendar0419 <- calendar0419 %>%
+filter(date >= as.Date("2019-04-08") & date < as.Date("2019-05-06"))
+calendar0519 <- calendar0519 %>%
+filter(date >= as.Date("2019-05-06") & date < as.Date("2019-06-04"))
+calendar0619 <- calendar0619 %>%
+filter(date >= as.Date("2019-06-04") & date < as.Date("2019-07-08"))
+calendar0719 <- calendar0719 %>%
+filter(date >= as.Date("2019-07-08") & date < as.Date("2019-08-08"))
+calendar0819 <- calendar0819 %>%
+filter(date >= as.Date("2019-08-08") & date < as.Date("2019-09-14"))
+calendar0919 <- calendar0919 %>%
+filter(date >= as.Date("2019-09-14") & date < as.Date("2019-10-15"))
+calendar1019 <- calendar1019 %>%
+filter(date >= as.Date("2019-10-15") & date < as.Date("2019-11-03"))
+calendar1119 <- calendar1119 %>%
+filter(date >= as.Date("2019-11-03") & date < as.Date("2019-12-07"))
+calendar1219 <- calendar1219 %>%
+filter(date >= as.Date("2019-12-07") & date < as.Date("2020-01-05"))
+
+calendar2019 <- rbind(calendar0119,calendar0219,calendar0319, calendar0419,calendar0519,calendar0619,calendar0719, calendar0819,calendar0919,calendar1019,calendar1119, calendar1219)
+
+rm(calendar0119,calendar0219,calendar0319, calendar0419,calendar0519,calendar0619,calendar0719, calendar0819,calendar0919,calendar1019,calendar1119, calendar1219)
+
+calendar2019 <- calendar2019[, c('listing_id','date', 'price')]
+#object.size(calendar2019)
+
+#Year 2020
+calendar0120 <- read_csv("calendar0120.csv")
+calendar0220 <- read_csv("calendar0220.csv")
+calendar0320 <- read_csv("calendar0320.csv")
+calendar0420 <- read_csv("calendar0420.csv")
+calendar0520 <- read_csv("calendar0520.csv")
+calendar0620 <- read_csv("calendar0620.csv")
+calendar0720 <- read_csv("calendar0720.csv")
+calendar0820 <- read_csv("calendar0820.csv")
+calendar0920 <- read_csv("calendar0920.csv")
+calendar1020 <- read_csv("calendar1020.csv")
+
+calendar0120 <- calendar0120 %>%
+filter(date >= as.Date("2020-01-05") & date < as.Date("2020-02-14"))
+calendar0220 <- calendar0220 %>%
+filter(date >= as.Date("2020-02-14") & date < as.Date("2020-03-13"))
+calendar0320 <- calendar0320 %>%
+filter(date >= as.Date("2020-03-13") & date < as.Date("2020-04-16"))
+calendar0420 <- calendar0420 %>%
+filter(date >= as.Date("2020-04-16") & date < as.Date("2020-05-08"))
+calendar0520 <- calendar0520 %>%
+filter(date >= as.Date("2020-05-08") & date < as.Date("2020-06-08"))
+calendar0620 <- calendar0620 %>%
+filter(date >= as.Date("2020-06-08") & date < as.Date("2020-07-09"))
+calendar0720 <- calendar0720 %>%
+filter(date >= as.Date("2020-07-09") & date < as.Date("2020-08-18"))
+calendar0820 <- calendar0820 %>%
+filter(date >= as.Date("2020-08-18") & date < as.Date("2020-09-09"))
+calendar0920 <- calendar0920 %>%
+filter(date >= as.Date("2020-09-09") & date < as.Date("2020-10-09"))
+calendar1020 <- calendar1020 %>%
+filter(date >= as.Date("2020-10-10") & date < as.Date("2020-11-01"))
+
+calendar2020 <- rbind(calendar0120,calendar0220,calendar0320, calendar0420,calendar0520,calendar0620,calendar0720, calendar0820,calendar0920,calendar1020)
+
+rm(calendar0120,calendar0220,calendar0320, calendar0420,calendar0520,calendar0620,calendar0720, calendar0820,calendar0920,calendar1020)
+
+calendar2020 <- calendar2020[, c('listing_id','date', 'price')]
+
+#End of Pricing Load
+#Setting up the Price Files for Models
+#Verification regarding NA values
+try2018 <- subset(calendar2018,is.na(calendar2018$price))
+
+#rm(try2018)
+#idfilter <- unique(try2018$listing_id)
+#try2 <- calendar2018[calendar2018$listing_id == 56879,]
+#try3 <- calendar2018[calendar2018$listing_id %in% idfilter,]
+
+#Put price into numeric values
+calendar2018$price <- as.numeric(gsub('[$,]', '', calendar2018$price))
+calendar2019$price <- as.numeric(gsub('[$,]', '', calendar2019$price))
+calendar2020$price <- as.numeric(gsub('[$,]', '', calendar2020$price))
+
+#Filling NA values that can be filled
+calendar2018 <- calendar2018 %>%
+group_by(listing_id)
+calendar2018 <- calendar2018 %>% arrange(desc(date), .by_group = TRUE)
+calendar2018 <- calendar2018 %>% 
+#default direction down
+fill(price, .direction = "up")
+calendar2018 <- calendar2018 %>% 
+#fill(price, .direction = "down")
+
+#Lots of NA value still in 2018 due to the fact that we use the starting file: listings starting in april 2018 with False Avaibility will have NA values for example
+
+#try2018 <- subset(calendar2018,is.na(calendar2018$price))
+calendar2019 <- calendar2019 %>%
+group_by(listing_id)
+calendar2019 <- calendar2019 %>% arrange(desc(date), .by_group = TRUE)
+calendar2019 <- calendar2019 %>% 
+#default direction down
+fill(price, .direction = "up")
+calendar2019 <- calendar2019 %>% 
+#fill(price, .direction = "down")
+calendar2020 <- calendar2020 %>%
+group_by(listing_id)
+calendar2020 <- calendar2020 %>% arrange(desc(date), .by_group = TRUE)
+calendar2020 <- calendar2020 %>% 
+#default direction down
+fill(price, .direction = "up")
+calendar2020 <- calendar2020 %>% 
+#fill(price, .direction = "down")
+
+calendardata <- rbind(calendar2018,calendar2019,calendar2020)
+
+rm(calendar2018,calendar2019,calendar2020)
+
+#rm(try2018)
+#Adding Reviews/Occupancy:
+Reviewsdata <- read_csv("reviews.csv")
+Reviewsdata <- subset(Reviewsdata, date >="2018-04-07" & date < "2020-11-01")
+
+#Merging Reviews and Calendar
+Reviewsdata <- Reviewsdata[,c('listing_id','date','id')]
+
+#Merge Reviews and calendar data, taking calendar(price) as the main df. Rows not present in calendar will not be added. Adds the review id to the listing/date corresponding
+Model_data <- left_join(calendardata,Reviewsdata)
+Model_data$reviews <- 0
+Model_data$reviews[!is.na(Model_data$id)] <- 1
+
+Model_data <- aggregate(reviews ~ listing_id+date, data = Model_data, FUN = sum, na.rm = T)
+
+#Some days have multiple reviews at the same time. To avoid duplicates, aggregate on listing id and day basis.
+Model_data <- left_join(Model_data,calendardata)
+
+#re-add price data to the new aggregate df
+rm(calendardata)
+rm(Reviewsdata)
+
+#Manipulation on Listing file
+#Need to add id/appartment type/Location/availability_30 and 365
+listing0418 <- read_csv("listings0418.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0518 <- read_csv("listings0518.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0618 <- read_csv("listings0618.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0718 <- read_csv("listings0718.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0818 <- read_csv("listings0818.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0918 <- read_csv("listings0918.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1018 <- read_csv("listings1018.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1118 <- read_csv("listings1118.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1218 <- read_csv("listings1218.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+
+#2019
+listing0119 <- read_csv("listings0119.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0219 <- read_csv("listings0219.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0319 <- read_csv("listings0319.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0419 <- read_csv("listings0419.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0519 <- read_csv("listings0519.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0619 <- read_csv("listings0619.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0719 <- read_csv("listings0719.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0819 <- read_csv("listings0819.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0919 <- read_csv("listings0919.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1019 <- read_csv("listings1019.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1119 <- read_csv("listings1119.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1219 <- read_csv("listings1219.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+
+#2020
+listing0120 <- read_csv("listings0120.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0220 <- read_csv("listings0220.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0320 <- read_csv("listings0320.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0420 <- read_csv("listings0420.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0520 <- read_csv("listings0520.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0620 <- read_csv("listings0620.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0720 <- read_csv("listings0720.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0820 <- read_csv("listings0820.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0920 <- read_csv("listings0920.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1020 <- read_csv("listings1020.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+
+listingdata <- rbind(listing0418, listing0518, listing0618, listing0718, listing0818, listing0918,listing1018, listing1118, listing1218, listing0119, listing0219, listing0319,listing0419, listing0519, listing0619, listing0719, listing0819, listing0919,listing1019, listing1119, listing1219, listing0120, listing0220, listing0320,listing0420, listing0520, listing0620, listing0720, listing0820, listing0920, listing1020)
+
+listingdata$last_scraped <- format(as.Date(listingdata$last_scraped), "%Y-%m")
+
+rm(listing0418, listing0518, listing0618, listing0718, listing0818, listing0918,listing1018, listing1118, listing1218, listing0119, listing0219, listing0319,listing0419, listing0519, listing0619, listing0719, listing0819, listing0919,listing1019, listing1119, listing1219, listing0120, listing0220, listing0320,listing0420, listing0520, listing0620, listing0720, listing0820, listing0920, listing1020)
+
+#d <- unique(listingdata$neighbourhood_cleansed)
+#list of all neighbourhood possible
+#view(d)
+locationfilterZuidoost <- c("Bijlmer-Centrum","Bijlmer-Oost","Gaasperdam - Driemond")
+locationfilterWest <- c("Bos en Lommer","Westerpark",'De Baarsjes - Oud-West')
+locationfilterZuid <- c("Buitenveldert - Zuidas","De Pijp - Rivierenbuurt",'Zuid')
+locationfilterCentrum <- c("Centrum-Oost","Centrum-West")
+locationfilterNoord <- c('Noord-Oost','Noord-West','Oud-Noord')
+locationfilterNieuwWest <- c('Geuzenveld - Slotermeer','Slotervaart','Osdorp','De Aker - Nieuw Sloten')
+locationfilterOost <- c('IJburg - Zeeburgereiland','Oostelijk Havengebied - Indische Buurt','Oud-Oost','Watergraafsmeer')
+
+#locationfilterWestpoort <- c() No flat in Westpoort.reason: really low population 192 people living there.
+
+listingdata$location <- NA
+
+#Give one of the 7 borough to the listings
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterZuidoost] <- "Zuidoost"
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterWest] <- "West"
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterZuid] <- "Zuid"
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterCentrum] <- "Centrum"
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterNoord] <- "Noord"
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterNieuwWest] <- "NieuwWest"
+listingdata$location[listingdata$neighbourhood_cleansed %in% locationfilterOost] <- "Oost"
+
+#Rename columns to match with model_data later on. Drop neighbourhood as we have location now.
+names(listingdata)[names(listingdata) == "id"] <- "listing_id"
+names(listingdata)[names(listingdata) == "last_scraped"] <- "month"
+listingdata <- subset(listingdata,select = -neighbourhood_cleansed)
+rm(locationfilterZuidoost,locationfilterWest,locationfilterZuid,locationfilterCentrum,locationfilterNoord,locationfilterNieuwWest,locationfilterOost)
+
+#Aggregating Price and Review number on a monthly basis
+Model_data$month <- format(as.Date(Model_data$date), "%Y-%m")
+
+#MonthPriceListing_C
+#Want the mean of the price for each listing per month
+try2 <- Model_data[Model_data$listing_id == 2818,]
+try3 <- try2[try2$month == "2018-09",]
+mean(try3$price)
+sum(try3$reviews)
+
+#Verification to be sure we get the mean per month for each id and the sum of reviews
+Model_data_price <- aggregate(price ~ listing_id+month, data = Model_data, FUN = mean, na.rm = T)
+try4 <- Model_data_price[Model_data_price$listing_id == 2818,]
+
+#However, we want the total number of reviews for each listing, which will give us the number of
+bookings for a month for each listing
+Model_data_reviews <- aggregate(reviews ~ listing_id+month, data = Model_data, FUN = sum, na.rm = T)
+try5 <- Model_data_reviews[Model_data_reviews$listing_id == 2818,]
+Model_data_PriceReviews <- left_join(Model_data_price,Model_data_reviews)
+
+#Combine the prices and reviews again
+#Merging listing and model_data
+Model_data_complete <- left_join(Model_data_PriceReviews,listingdata)
+Model_data_complete <- Model_data_complete[!duplicated(Model_data_complete),]
+
+#608642-571476 observation were lost as there was no corresponding data between listing and price
+Model_data_complete$reviews <- Model_data_complete$reviews/0.5
+
+#number of bookings
+#We now have the complete file for the analysis
+rm(Model_data,try2,try3,try4,listingdata,Model_data_reviews,Model_data_price,Model_data_PriceReviews,try5)
+z <- Model_data_complete[Model_data_complete$price >= 10000,]
+
+#20 price higher than 10000. high number skewing everything up: remove them
+Model_data_complete <- subset(Model_data_complete, price < 16000)
+
+#Subsetting for ARIMA/VAR using location and room type
+Model_data_complete2 <- subset(Model_data_complete, availability_30 > 0)
+
+#1st level analysis: just get monthly mean price/average availability/average bookings per month
+without anything else
+P <- L1Price[L1Price$month>= '2020-01',]
+PQ <- P[P$month < '2020-01',]
+mean(P$price)
+L1Price <- aggregate(price ~ month, data = Model_data_complete, FUN = mean, na.rm = T)
+L1Pricet <- ts(data=L1Price$price,frequency=12,start=c(2018,4))
+ts.plot(L1Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices", xlab='years')
+L1Price_Arima <- auto.arima(L1Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L1Price_Arima_Resid <- resid(L1Price_Arima)
+Box.test(L1Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L1Price_Arima_Resid)
+L1Price2 <- aggregate(price ~ month, data = Model_data_complete2, FUN = mean, na.rm = T)
+L1Pricet2 <- ts(data=L1Price2$price,frequency=12,start=c(2018,4))
+ts.plot(L1Pricet2, gpars = list(col = c("blue", "red")), main="Monthly Prices", xlab='years')
+L1Price_Arima2 <- auto.arima(L1Pricet2, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L1Price_Arima_Resid2 <- resid(L1Price_Arima2)
+Box.test(L1Price_Arima_Resid2, type="Ljung-Box")
+checkresiduals(L1Price_Arima_Resid2)
+L1Supply <- aggregate(availability_30 ~ month, data = Model_data_complete, FUN = mean, na.rm = T)
+L1Supplyt <- ts(data=L1Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L1Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month", xlab='years')
+L1SupplyArima <- auto.arima(L1Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L1Supply_Arima_Resid <- resid(L1SupplyArima)
+Box.test(L1Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L1Supply_Arima_Resid, df=4)
+L1Bookings <- aggregate(reviews ~ month, data = Model_data_complete, FUN = mean, na.rm = T)
+L1Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L1Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings", xlab='years')
+L1BookingArima <- auto.arima(L1Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L1Booking_Arima_Resid <- resid(L1BookingArima)
+Box.test(L1Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L1Booking_Arima_Resid, df=4)
+
+#Var
+VarVectorL1 <- cbind(L1Pricet,L1Supplyt,L1Bookingst)
+plot(VarVectorL1, nc=2)
+ndiffs(VarVectorL1[,"L1Pricet"],test="adf")
+ndiffs(VarVectorL1[,"L1Supplyt"],test="adf")
+ndiffs(VarVectorL1[,"L1Bookingst"],test="adf")
+df_e <- ur.df(VarVectorL1[,"L1Pricet"], type = "trend")
+df_e@cval
+df_e@teststat
+VarVectorL12 <- VarVectorL1[-1,]
+VarVectorL12 <- sapply(VarVectorL1,diff)
+ndiffs(VarVectorL12[,"L1Pricet"],test="adf")
+ndiffs(VarVectorL12[,"L1Supplyt"],test="adf")
+ndiffs(VarVectorL12[,"L1Bookingst"],test="adf")
+VARselect(VarVectorL12,type="both")
+Level1_Var <- VAR(VarVectorL12, type="both", p=6)
+summary(Level1_Var)
+AIC(Level1_Var)
+plot(Level1_Var, names="L1Pricet")
+plot(Level1_Var, names="L1Supplyt")
+plot(Level1_Var, names="L1Bookingst")
+roots(Level1_Var)
+serial.test(Level1_Var)
+normality.test(Level1_Var)
+dev.off()
+Level1_Var_IRF <- irf(Level1_Var)
+plot(Level1_Var_IRF, names = "L1Bookingst")
+Level1_Var_IRF <- irf(Level1_Var, cumulative=TRUE)
+plot(Level1_Var_IRF, names = "L1Bookingst")
+Level1_Var_pred <- predict(Level1_Var)
+Level1_Var_pred$fcst$L1Pricet
+plot(Level1_Var_pred,names="L1Pricet")
+price_pred <- data.frame(Level1_Var_pred$fcst$L1Pricet)
+price_pred <- cumsum(price_pred)
+price_pred <- price_pred + as.numeric(tail(VarVectorL1[,"L1Pricet"],1))
+price_pred
+
+price_fcst <- ts(c(VarVectorL1[,"L1Pricet"], price_pred[,"fcst"]),start= start(VarVectorL1[,"L1Pricet"]), frequency=12)
+price_fcst <- cbind(price_fcst, upper = NA, lower=NA)
+price_fcst[32:41,"lower"] <- price_pred[,"lower"]
+price_fcst[32:41,"upper"] <- price_pred[,"upper"]
+matplot(price_fcst, type="l", col=c("black","red",'red'),lty= c(1,3,3))
+bookings_pred <- data.frame(Level1_Var_pred$fcst$L1Bookingst)
+bookings_pred <- cumsum(bookings_pred)
+bookings_pred <- bookings_pred + as.numeric(tail(VarVectorL1[,"L1Bookingst"],1))
+bookings_pred
+
+bookings_fcst <- tsc(VarVectorL1[,"L1Bookingst"], bookings_pred[,"fcst"]),start=start(VarVectorL1[,"L1Bookingst"]), frequency=12)
+bookings_fcst <- cbind(bookings_fcst, upper = NA, lower=NA)
+bookings_fcst[32:41,"lower"] <- bookings_pred[,"lower"]
+bookings_fcst[32:41,"upper"] <- bookings_pred[,"upper"]
+matplot(bookings_fcst, type="l", col=c("black","red",'red'),lty= c(1,3,3))
+avail_pred <- data.frame(Level1_Var_pred$fcst$L1Supplyt)
+avail_pred <- cumsum(avail_pred)
+avail_pred <- avail_pred + as.numeric(tail(VarVectorL1[,"L1Supplyt"],1))
+avail_pred
+
+avail_fcst <- ts(c(VarVectorL1[,"L1Supplyt"], avail_pred[,"fcst"]),start= start(VarVectorL1[,"L1Supplyt"]), frequency=12)
+avail_fcst <- cbind(avail_fcst, upper = NA, lower=NA)
+avail_fcst[32:41,"lower"] <- avail_pred[,"lower"]
+avail_fcst[32:41,"upper"] <- avail_pred[,"upper"]
+matplot(avail_fcst, type="l", col=c("black","red",'red'),lty= c(1,3,3))
+
+#2nd level analysis: subset per location. (7)
+L2_Model_Zuidoost <- subset(Model_data_complete, location == "Zuidoost")
+L2Price <- aggregate(price ~ month, data = L2_Model_Zuidoost, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In Zuidoost", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_Zuidoost, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in Zuidoost", xlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_Zuidoost, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in Zuidoost", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+L2_Model_West <- subset(Model_data_complete, location == "West")
+L2Price <- aggregate(price ~ month, data = L2_Model_West, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In West", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_West, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in West", xlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_West, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in West", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+L2_Model_Zuid <- subset(Model_data_complete, location == "Zuid")
+L2Price <- aggregate(price ~ month, data = L2_Model_Zuid, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In Zuid", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_Zuid, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in Zuid", xlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_Zuid, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in Zuid", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+L2_Model_Centrum <- subset(Model_data_complete, location == "Centrum")
+L2Price <- aggregate(price ~ month, data = L2_Model_Centrum, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In Centrum", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_Centrum, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in Centrum", xlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_Centrum, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in Centrum", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+L2_Model_Noord <- subset(Model_data_complete, location == "Noord")
+L2Price <- aggregate(price ~ month, data = L2_Model_Noord, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In Noord", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_Noord, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in Noord",mxlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_Noord, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in Noord", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12,mmax.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+L2_Model_NieuwWest <- subset(Model_data_complete, location == "NieuwWest")
+L2Price <- aggregate(price ~ month, data = L2_Model_NieuwWest, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In NieuwWest", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_NieuwWest, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in NieuwWest", xlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_NieuwWest, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in NieuwWest", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+L2_Model_Oost <- subset(Model_data_complete, location == "Oost")
+L2Price <- aggregate(price ~ month, data = L2_Model_Oost, FUN = mean, na.rm = T)
+L2Pricet <- ts(data=L2Price$price,frequency=12,start=c(2018,4))
+ts.plot(L2Pricet, gpars = list(col = c("blue", "red")), main="Monthly Prices In NieuwWest", xlab='years')
+L2Price_Arima <- auto.arima(L2Pricet, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Price_Arima_Resid <- resid(L2Price_Arima)
+Box.test(L2Price_Arima_Resid, type="Ljung-Box")
+checkresiduals(L2Price_Arima_Resid)
+L2Supply <- aggregate(availability_30 ~ month, data = L2_Model_Oost, FUN = mean, na.rm = T)
+L2Supplyt <- ts(data=L2Supply$availability_30,frequency=12,start=c(2018,4))
+ts.plot(L2Supplyt, gpars = list(col = c("blue", "red")), main="Availability per month in NieuwWest", xlab='years')
+L2SupplyArima <- auto.arima(L2Supplyt, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d=2, max.D = 2, stationary = T)
+L2Supply_Arima_Resid <- resid(L2SupplyArima)
+Box.test(L2Supply_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Supply_Arima_Resid, df=4)
+L2Bookings <- aggregate(reviews ~ month, data = L2_Model_Oost, FUN = mean, na.rm = T)
+L2Bookingst <- ts(data=L1Bookings$reviews,frequency=12,start=c(2018,4))
+ts.plot(L2Bookingst, gpars = list(col = c("blue", "red")), main="Monthly Bookings in NieuwWest", xlab='years')
+L2BookingArima <- auto.arima(L2Bookingst, trace = T , max.p = 6, max.q = 6, max.Q = 12, max.P = 12, max.d =2, max.D = 2, stationary = T)
+L2Booking_Arima_Resid <- resid(L2BookingArima)
+Box.test(L2Booking_Arima_Resid, type="Ljung-Box", lag=24, fitdf=4)
+checkresiduals(L2Booking_Arima_Resid, df=4)
+VarVectorL1 <- cbind(L1Pricet,L1Supplyt,L1Bookingst)
+plot(VarVectorL1, nc=2)
+ndiffs(VarVectorL1[,"L1Pricet"],test="adf")
+ndiffs(VarVectorL1[,"L1Supplyt"],test="adf")
+ndiffs(VarVectorL1[,"L1Bookingst"],test="adf")
+df_e <- ur.df(VarVectorL1[,"L1Pricet"], type = "trend")
+df_e@cval
+df_e@teststat
+VarVectorL12 <- VarVectorL1[-1,]
+VarVectorL12 <- sapply(VarVectorL1,diff)
+ndiffs(VarVectorL12[,"L1Pricet"],test="adf")
+ndiffs(VarVectorL12[,"L1Supplyt"],test="adf")
+ndiffs(VarVectorL12[,"L1Bookingst"],test="adf")
+VARselect(VarVectorL12,type="both")
+Level1_Var <- VAR(VarVectorL12, type="both", p=6)
+summary(Level1_Var)
+AIC(Level1_Var)
+plot(Level1_Var, names="L1Pricet")
+plot(Level1_Var, names="L1Supplyt")
+plot(Level1_Var, names="L1Bookingst")
+roots(Level1_Var)
+serial.test(Level1_Var)
+normality.test(Level1_Var)
+dev.off()
+Level1_Var_IRF <- irf(Level1_Var)
+plot(Level1_Var_IRF, names = "L1Bookingst")
+Level1_Var_IRF <- irf(Level1_Var, cumulative=TRUE)
+plot(Level1_Var_IRF, names = "L1Bookingst")
+Level1_Var_pred <- predict(Level1_Var)
+Level1_Var_pred$fcst$L1Pricet
+plot(Level1_Var_pred,names="L1Pricet")
+price_pred <- data.frame(Level1_Var_pred$fcst$L1Pricet)
+price_pred <- cumsum(price_pred)
+price_pred <- price_pred + as.numeric(tail(VarVectorL1[,"L1Pricet"],1))
+price_pred
+
+price_fcst <- ts(c(VarVectorL1[,"L1Pricet"], price_pred[,"fcst"]),start= start(VarVectorL1[,"L1Pricet"]), frequency=12)
+price_fcst <- cbind(price_fcst, upper = NA, lower=NA)
+price_fcst[32:41,"lower"] <- price_pred[,"lower"]
+price_fcst[32:41,"upper"] <- price_pred[,"upper"]
+matplot(price_fcst, type="l", col=c("black","red",'red'),lty= c(1,3,3))
+bookings_pred <- data.frame(Level1_Var_pred$fcst$L1Bookingst)
+bookings_pred <- cumsum(bookings_pred)
+bookings_pred <- bookings_pred + as.numeric(tail(VarVectorL1[,"L1Bookingst"],1))
+bookings_pred
+
+bookings_fcst <- ts(c(VarVectorL1[,"L1Bookingst"], bookings_pred[,"fcst"]),start= start(VarVectorL1[,"L1Bookingst"]), frequency=12)
+bookings_fcst <- cbind(bookings_fcst, upper = NA, lower=NA)
+bookings_fcst[32:41,"lower"] <- bookings_pred[,"lower"]
+bookings_fcst[32:41,"upper"] <- bookings_pred[,"upper"]
+matplot(bookings_fcst, type="l", col=c("black","red",'red'),lty= c(1,3,3))
+avail_pred <- data.frame(Level1_Var_pred$fcst$L1Supplyt)
+avail_pred <- cumsum(avail_pred)
+avail_pred <- avail_pred + as.numeric(tail(VarVectorL1[,"L1Supplyt"],1))
+avail_pred
+
+avail_fcst <- ts(c(VarVectorL1[,"L1Supplyt"], avail_pred[,"fcst"]),start= start(VarVectorL1[,"L1Supplyt"]), frequency=12)
+avail_fcst <- cbind(avail_fcst, upper = NA, lower=NA)
+avail_fcst[32:41,"lower"] <- avail_pred[,"lower"]
+avail_fcst[32:41,"upper"] <- avail_pred[,"upper"]
+matplot(avail_fcst, type="l", col=c("black","red",'red'),lty= c(1,3,3))
+
+#Decision Tree Regression
+#Add Covid-Data:
+newcases <- read_csv("Covid_Month.csv")
+values = seq(from = as.Date("2020-03-01"), to = as.Date("2020-11-01"), by = 'month')
+newcases$month <- values
+newcases$month <- format(as.Date(newcases$month), "%Y-%m")
+DTree_data <- left_join(Model_data_complete,newcases)
+DTree_data$New_infections[is.na(DTree_data$New_infections)]<- 0
+testing_index <- sample(1:573506,replace=F,172052)
+testing_tree <- DTree_data[testing_index,]
+training_tree <- DTree_data[-testing_index,]
+Airbnb_0 <- rpart(price~reviews+room_type+availability_30+location+New_infections,data=training_tree,method='anova')
+summary(Airbnb_0, "CP")
+rpart.plot(Airbnb_0)
+PredictTree <- predict(Airbnb_0,training_tree)
+TreeActualPredicted <- data.frame(predicted=PredictTree,actual = training_tree$price)
+PredictTree2 <- predict(Airbnb_0,testing_tree)
+TreeActualPredicted2 <- data.frame(predicted=PredictTree2,actual = testing_tree$price)
+qplot(actual, predicted, data = TreeActualPredicted, geom="point" )+geom_abline(slope=1, col="blue")
+qplot(actual, predicted, data = TreeActualPredicted2, geom="point" )+geom_abline(slope=1, col="blue")
+
+#Data set without 2018
+training_201920 <- training_tree[training_tree$month>'2019-01',]
+Airbnb_1 <- rpart(price~reviews+room_type+availability_30+location+New_infections,data=training_201920,method='anova')
+summary(Airbnb_1)
+rpart.plot(Airbnb_1)
+Airbnb_2 <- rpart(price~reviews+availability_30+room_type+location+New_infections+month,data=training_tree,method='anova')
+summary(Airbnb_2)
+plotcp(Airbnb_0, upper="splits")
+par(new=TRUE)
+plotcp(Airbnb_2, upper="splits")
+rpart.plot(Airbnb_2)
+---
+title: "AirBnB Amsterdam"
+output:
+pdf_document: default
+html_notebook: default
+word_document: default
+---
+```{r Load necessary libraries}
+listOfPackages <- c("readr","readxl", "chron", "cowplot", "dplyr", "ggpubr", "ggplot2", "lubridate", "magrittr", "patchwork", "tidyverse", "urca", "forecast", "vars", "tseries")
+for (i in listOfPackages){if(! i %in% installed.packages()){install.packages(i, dependencies = TRUE)}require(i)}
+library(readr)
+library(readxl)
+library(chron)
+library(cowplot)
+library(dplyr)
+library(ggpubr)
+library(ggplot2)
+library(lubridate)
+library(magrittr)
+library(patchwork)
+library(tidyverse)
+library(urca)
+library(forecast)
+library(vars)
+library(tseries)
+```
+```{r COVID-19 cases}
+#Amsterdam Covid Cases
+AmsterdamCases <- read_excel("COVID-19_Amsterdam.xlsx",
+col_types = c("date", "text", "text",
+"text", "numeric", "numeric", "numeric"))
+
+#Drop non-essentials
+cov <- AmsterdamCases[, c('Date_of_report', 'Total_reported')]
+
+#Transfrom date
+cov$Date_of_report <- as.Date(cov$Date_of_report,"%Y-%m-%d")
+colnames(cov) <- c("date", "newcases")
+
+#TS
+covTS <- ts(cov[,2], frequency = 365, start=c(2020,3,13))
+#Plot of cases over time
+ts.plot(covTS, gpars=list(ylab="Total COVID-19 Cases", main="COVID-19 Cases Amsterdam"))
+```
+```{r listings}
+#Read CSV files
+listing0418 <- read_csv("listings0418.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0518 <- read_csv("listings0518.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0618 <- read_csv("listings0618.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0718 <- read_csv("listings0718.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0818 <- read_csv("listings0818.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0918 <- read_csv("listings0918.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1018 <- read_csv("listings1018.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1118 <- read_csv("listings1118.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1218 <- read_csv("listings1218.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+
+#2019
+listing0119 <- read_csv("listings0119.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0219 <- read_csv("listings0219.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0319 <- read_csv("listings0319.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0419 <- read_csv("listings0419.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0519 <- read_csv("listings0519.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0619 <- read_csv("listings0619.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0719 <- read_csv("listings0719.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0819 <- read_csv("listings0819.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0919 <- read_csv("listings0919.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1019 <- read_csv("listings1019.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1119 <- read_csv("listings1119.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1219 <- read_csv("listings1219.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+
+#2020
+listing0120 <- read_csv("listings0120.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0220 <- read_csv("listings0220.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0320 <- read_csv("listings0320.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0420 <- read_csv("listings0420.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0520 <- read_csv("listings0520.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0620 <- read_csv("listings0620.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0720 <- read_csv("listings0720.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0820 <- read_csv("listings0820.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing0920 <- read_csv("listings0920.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+listing1020 <- read_csv("listings1020.csv",col_types = cols("license" = col_character()))[,c('id','last_scraped','neighbourhood_cleansed','room_type','availability_30','availability_365')]
+Listings <- read_csv("listings1020.csv",col_types = cols("license" = col_character()))
+
+#Editing Listings
+listing0418$Month <- format(as.Date(listing0418$last_scraped), "%Y-%m")
+listing0518$Month <- format(as.Date(listing0518$last_scraped), "%Y-%m")
+listing0618$Month <- format(as.Date(listing0618$last_scraped), "%Y-%m")
+listing0718$Month <- format(as.Date(listing0718$last_scraped), "%Y-%m")
+listing0818$Month <- format(as.Date(listing0818$last_scraped), "%Y-%m")
+listing0918$Month <- format(as.Date(listing0918$last_scraped), "%Y-%m")
+listing1018$Month <- format(as.Date(listing1018$last_scraped), "%Y-%m")
+listing1118$Month <- format(as.Date(listing1118$last_scraped), "%Y-%m")
+listing1218$Month <- format(as.Date(listing1218$last_scraped), "%Y-%m")
+listing0119$Month <- format(as.Date(listing0119$last_scraped), "%Y-%m")
+listing0219$Month <- format(as.Date(listing0219$last_scraped), "%Y-%m")
+listing0319$Month <- format(as.Date(listing0319$last_scraped), "%Y-%m")
+listing0419$Month <- format(as.Date(listing0419$last_scraped), "%Y-%m")
+listing0519$Month <- format(as.Date(listing0519$last_scraped), "%Y-%m")
+listing0619$Month <- format(as.Date(listing0619$last_scraped), "%Y-%m")
+listing0719$Month <- format(as.Date(listing0719$last_scraped), "%Y-%m")
+listing0819$Month <- format(as.Date(listing0819$last_scraped), "%Y-%m")
+listing0919$Month <- format(as.Date(listing0919$last_scraped), "%Y-%m")
+listing1019$Month <- format(as.Date(listing1019$last_scraped), "%Y-%m")
+listing1119$Month <- format(as.Date(listing1119$last_scraped), "%Y-%m")
+listing1219$Month <- format(as.Date(listing1219$last_scraped), "%Y-%m")
+listing0120$Month <- format(as.Date(listing0120$last_scraped), "%Y-%m")
+listing0220$Month <- format(as.Date(listing0220$last_scraped), "%Y-%m")
+listing0320$Month <- format(as.Date(listing0320$last_scraped), "%Y-%m")
+listing0420$Month <- format(as.Date(listing0420$last_scraped), "%Y-%m")
+listing0520$Month <- format(as.Date(listing0520$last_scraped), "%Y-%m")
+listing0620$Month <- format(as.Date(listing0620$last_scraped), "%Y-%m")
+listing0720$Month <- format(as.Date(listing0720$last_scraped), "%Y-%m")
+listing0820$Month <- format(as.Date(listing0820$last_scraped), "%Y-%m")
+listing0920$Month <- format(as.Date(listing0920$last_scraped), "%Y-%m")
+listing1020$Month <- format(as.Date(listing1020$last_scraped), "%Y-%m")
+listing.list <- mget(ls(pattern = "listing.*"))
+listings.new <- lapply(listing.list, function(x) x[, c('id', 'Month', 'availability_30', 'availability_365')])
+Availability <- bind_rows(listings.new, .id = "column_label")
+Availability <- Availability[,c(2:5)]
+Availability <- Availability[order(Availability$Month),]
+Availability$key <- paste(Availability$id,sep="-",Availability$Month)
+listingdata <- rbind(listing0418, listing0518, listing0618, listing0718, listing0818, listing0918,listing1018, listing1118, listing1218, listing0119, listing0219, listing0319,listing0419, listing0519, listing0619, listing0719, listing0819, listing0919,listing1019, listing1119, listing1219, listing0120, listing0220, listing0320,listing0420, listing0520, listing0620, listing0720, listing0820, listing0920, listing1020)
+listingdata$last_scraped <- format(as.Date(listingdata$last_scraped), "%Y-%m")
+rm(listing0418, listing0518, listing0618, listing0718, listing0818, listing0918, listing1018, listing1118, listing1218, listing0119, listing0219, listing0319, listing0419, listing0519, listing0619, listing0719, listing0819, listing0919,listing1019, listing1119, listing1219, listing0120, listing0220, listing0320,listing0420, listing0520, listing0620, listing0720, listing0820, listing0920, listing1020)
+```
+```{r calendar data}
+
+#2018
+calendar0418 <- read_csv("calendar0418.csv",col_types = cols("price" = col_character()))
+calendar0518 <- read_csv("calendar0518.csv",col_types = cols("price" = col_character()))
+calendar0618 <- read_csv("calendar0618.csv",col_types = cols("price" = col_character()))
+calendar0718 <- read_csv("calendar0718.csv",col_types = cols("price" = col_character()))
+calendar0818 <- read_csv("calendar0818.csv",col_types = cols("price" = col_character()))
+calendar0918 <- read_csv("calendar0918.csv",col_types = cols("price" = col_character()))
+calendar1018 <- read_csv("calendar1018.csv",col_types = cols("price" = col_character()))
+calendar1118 <- read_csv("calendar1118.csv",col_types = cols("price" = col_character()))
+calendar1218 <-read_csv("calendar1218.csv",col_types = cols("price" = col_character()))
+
+#2019
+calendar0119 <- read_csv("calendar0119.csv",col_types = cols("price" = col_character()))
+calendar0219 <- read_csv("calendar0219.csv",col_types = cols("price" = col_character()))
+calendar0319 <- read_csv("calendar0319.csv",col_types = cols("price" = col_character()))
+calendar0419 <- read_csv("calendar0419.csv",col_types = cols("price" = col_character()))
+calendar0519 <- read_csv("calendar0519.csv",col_types = cols("price" = col_character()))
+calendar0619 <- read_csv("calendar0619.csv",col_types = cols("price" = col_character()))
+calendar0719 <- read_csv("calendar0719.csv",col_types = cols("price" = col_character()))
+calendar0819 <- read_csv("calendar0819.csv",col_types = cols("price" = col_character()))
+calendar0919 <- read_csv("calendar0919.csv",col_types = cols("price" = col_character()))
+calendar1019 <- read_csv("calendar1019.csv",col_types = cols("price" = col_character()))
+calendar1119 <- read_csv("calendar1119.csv",col_types = cols("price" = col_character()))
+calendar1219 <-read_csv("calendar1219.csv",col_types = cols("price" = col_character()))
+
+#2020
+calendar0120 <- read_csv("calendar0120.csv",col_types = cols("price" = col_character()))
+calendar0220 <- read_csv("calendar0220.csv",col_types = cols("price" = col_character()))
+calendar0320 <- read_csv("calendar0320.csv",col_types = cols("price" = col_character()))
+calendar0420 <- read_csv("calendar0420.csv",col_types = cols("price" = col_character()))
+calendar0520 <- read_csv("calendar0520.csv",col_types = cols("price" = col_character()))
+calendar0620 <- read_csv("calendar0620.csv",col_types = cols("price" = col_character()))
+calendar0720 <- read_csv("calendar0720.csv",col_types = cols("price" = col_character()))
+calendar0820 <- read_csv("calendar0820.csv",col_types = cols("price" = col_character()))
+calendar0920 <- read_csv("calendar0920.csv",col_types = cols("price" = col_character()))
+calendar1020 <- read_csv("calendar1020.csv",col_types = cols("price" = col_character()))
+
+#Filter for the dates we need for analysis. We picked the date-jumps based on their
+
+#webgrapping date.
+calendar0418 <- calendar0418 %>%
+filter(date >= as.Date("2018-04-07") & date < as.Date("2018-05-10"))
+calendar0518 <- calendar0518 %>%
+filter(date >= as.Date("2018-05-10") & date < as.Date("2018-06-06"))
+calendar0618 <- calendar0618 %>%
+filter(date >= as.Date("2018-06-06") & date < as.Date("2018-07-06"))
+calendar0718 <- calendar0718 %>%
+filter(date >= as.Date("2018-07-06") & date < as.Date("2018-08-07"))
+calendar0818 <- calendar0818 %>%
+filter(date >= as.Date("2018-08-07") & date < as.Date("2018-09-08"))
+calendar0918 <- calendar0918 %>%
+filter(date >= as.Date("2018-09-08") & date < as.Date("2018-10-05"))
+calendar1018 <- calendar1018 %>%
+filter(date >= as.Date("2018-10-05") & date < as.Date("2018-11-04"))
+calendar1118 <- calendar1118 %>%
+filter(date >= as.Date("2018-11-04") & date < as.Date("2018-12-06"))
+calendar1218 <- calendar1218 %>%
+filter(date >= as.Date("2018-12-06") & date < as.Date("2019-01-13"))
+calendar0119 <- calendar0119 %>%
+filter(date >= as.Date("2019-01-13") & date < as.Date("2019-02-04"))
+calendar0219 <- calendar0219 %>%
+filter(date >= as.Date("2019-02-04") & date < as.Date("2019-03-07"))
+calendar0319 <- calendar0319 %>%
+filter(date >= as.Date("2019-03-07") & date < as.Date("2019-04-08"))
+calendar0419 <- calendar0419 %>%
+filter(date >= as.Date("2019-04-08") & date < as.Date("2019-05-06"))
+calendar0519 <- calendar0519 %>%
+filter(date >= as.Date("2019-05-06") & date < as.Date("2019-06-04"))
+calendar0619 <- calendar0619 %>%
+filter(date >= as.Date("2019-06-04") & date < as.Date("2019-07-08"))
+calendar0719 <- calendar0719 %>%
+filter(date >= as.Date("2019-07-08") & date < as.Date("2019-08-08"))
+calendar0819 <- calendar0819 %>%
+filter(date >= as.Date("2019-08-08") & date < as.Date("2019-09-14"))
+calendar0919 <- calendar0919 %>%
+filter(date >= as.Date("2019-09-14") & date < as.Date("2019-10-15"))
+calendar1019 <- calendar1019 %>%
+filter(date >= as.Date("2019-10-15") & date < as.Date("2019-11-03"))
+calendar1119 <- calendar1119 %>%
+filter(date >= as.Date("2019-11-03") & date < as.Date("2019-12-07"))
+calendar1219 <- calendar1219 %>%
+filter(date >= as.Date("2019-12-07") & date < as.Date("2020-01-05"))
+calendar0120 <- calendar0120 %>%
+filter(date >= as.Date("2020-01-05") & date < as.Date("2020-02-14"))
+calendar0220 <- calendar0220 %>%
+filter(date >= as.Date("2020-02-14") & date < as.Date("2020-03-13"))
+calendar0320 <- calendar0320 %>%
+filter(date >= as.Date("2020-03-13") & date < as.Date("2020-04-16"))
+calendar0420 <- calendar0420 %>%
+filter(date >= as.Date("2020-04-16") & date < as.Date("2020-05-08"))
+calendar0520 <- calendar0520 %>%
+filter(date >= as.Date("2020-05-08") & date < as.Date("2020-06-08"))
+calendar0620 <- calendar0620 %>%
+filter(date >= as.Date("2020-06-08") & date < as.Date("2020-07-09"))
+calendar0720 <- calendar0720 %>%
+filter(date >= as.Date("2020-07-09") & date < as.Date("2020-08-18"))
+calendar0820 <- calendar0820 %>%
+filter(date >= as.Date("2020-08-18") & date < as.Date("2020-09-09"))
+calendar0920 <- calendar0920 %>%
+filter(date >= as.Date("2020-09-09") & date < as.Date("2020-10-09"))
+calendar1020 <- calendar1020 %>%
+filter(date >= as.Date("2020-10-10") & date < as.Date("2020-11-01"))
+```
+```{r calendar datasets}
+calendar2018 <- rbind(calendar0418, calendar0518, calendar0618,calendar0718, calendar0818, calendar0918,calendar1018, calendar1118, calendar1218)
+calendar2018 <- calendar2018[, c('listing_id','date', 'price')]
+calendar2019 <- rbind(calendar0319,calendar0419, calendar0519, calendar0619, calendar0719,calendar0819, calendar0919, calendar1019)
+calendar2020 <- rbind(calendar0320, calendar0420, calendar0520, calendar0620, calendar0720,calendar0820, calendar0920, calendar1020)
+calendar1920 <- rbind(calendar0119, calendar0219, calendar0319,calendar0419, calendar0519,calendar0619, calendar0719, calendar0819, calendar0919, calendar1019, calendar1119, calendar1219,calendar0120, calendar0220, calendar0320,calendar0420, calendar0519, calendar0620, calendar0720,calendar0820, calendar0920, calendar1020)
+calendar1920 <- calendar1920[, c('listing_id','date', 'price')]
+
+#Assumption: Filled NAs = prices don't change
+calendar2018 <- calendar2018 %>%
+group_by(listing_id)
+calendar2018 <- calendar2018 %>% arrange(desc(date), .by_group = TRUE)
+calendar2018 <- calendar2018 %>% 
+#default direction down
+fill(price, .direction = "up")
+calendar2018 <- calendar2018 %>% 
+#fill(price, .direction = "down")
+
+#Lots of NA value still in 2018 due to the fact that we use the starting file: listings starting in april 2018
+with False Avaibility will have NA values for example
+
+#try2018 <- subset(calendar2018,is.na(calendar2018$price))
+calendar2019 <- calendar2019 %>%
+group_by(listing_id)
+calendar2019 <- calendar2019 %>% arrange(desc(date), .by_group = TRUE)
+calendar2019 <- calendar2019 %>% 
+#default direction down
+fill(price, .direction = "up")
+calendar2019 <- calendar2019 %>% 
+#fill(price, .direction = "down")
+calendar2020 <- calendar2020 %>%
+group_by(listing_id)
+calendar2020 <- calendar2020 %>% arrange(desc(date), .by_group = TRUE)
+calendar2020 <- calendar2020 %>% 
+#default direction down
+fill(price, .direction = "up")
+calendar2020 <- calendar2020 %>% 
+#fill(price, .direction = "down")
+calendarTS <- rbind(calendar2018, calendar1920)
+calendardata <- calendarTS
+calendardata$price <- as.numeric(gsub('[$,]', '', calendardata$price))
+rm(calendar2018, calendar1920)
+
+#Editing
+calendarTS$Month <- format(as.Date(calendarTS$date), "%Y-%m")
+calendarTS$Month <- as.Date(paste(calendarTS$Month,"-01", sep=""))
+calendarTS <- calendarTS[order(calendarTS$Month),]
+```
+```{r Reviews}
+Reviewsdata <- read_csv("reviews.csv")
+Reviewsdata <- subset(Reviewsdata, date >="2018-04-07" & date < "2020-11-01")
+Reviewsdata <- unique(Reviewsdata[,c("listing_id", "date", "id")])
+Demand <- Reviewsdata[,c("listing_id", "date")]
+Demand$Month <- format(as.Date(Demand$date), "%Y-%m")
+```
+```{r Endogeneous variables are: price, availability, demand}
+#Regression
+##Price
+###2019
+#Preparation
+calendar2019$price2019 <- as.numeric(gsub("\\$", "", calendar2019$price))
+calendar2019$Month <- format(as.Date(calendar2019$date), "%m")
+
+#Aggregation
+aggcalendar2019 <- aggregate(price2019~listing_id+Month, calendar2019, mean, rm.na=T)
+names(aggcalendar2019)[names(aggcalendar2019) == 'listing_id'] <- 'id'
+Price2019 <- merge(subset(Listings, select=c("id", "host_is_superhost", "neighbourhood_cleansed",
+"room_type", "accommodates", "minimum_nights")),
+aggcalendar2019, by="id")
+
+#Factor Transformation
+Price2019$host_is_superhost <- as.factor(sapply(Price2019$host_is_superhost, as.numeric))
+Price2019$neighbourhood_cleansed <- as.factor(Price2019$neighbourhood_cleansed)
+Price2019$room_type <- as.factor(Price2019$room_type)
+Price2019$Month <- as.factor(Price2019$Month)
+
+#Filter
+idfilterAvail <- subset(Listings, availability_365>=0, id)
+Price2019 <- Price2019[Price2019$id %in% idfilterAvail$id,c(2:8)]
+
+#Linear Regression
+LinRegPrice2019 <- lm(log(price2019) ~., Price2019)
+summary(LinRegPrice2019)
+
+#Plot Residuals
+ggdensity(LinRegPrice2019$residuals,
+main = "Residuals Plot",
+xlab = "Residuals")
+qqnorm(scale(LinRegPrice2019$residuals))
+qqline(scale(LinRegPrice2019$residuals))
+```
+```{r Regression: 2020+COVID}
+#Preparation
+calendar2020$price2020 <- as.numeric(gsub("\\$", "", calendar2020$price))
+calendar2020$Month <- format(as.Date(calendar2020$date), "%m")
+calendar2020id <- calendar2020[calendar2020$listing_id %in% idfilterAvail$id,]
+Price2020 <- aggregate(price2020~date, calendar2020id,mean)
+Price2020 <- merge(Price2020, cov, by="date")
+Price2020 <- Price2020 %>%
+mutate(WHO_measures = if_else(date >="2020-06-15" & date <"2020-08-18", 0, 1))
+
+#Linear Regression
+LinRegPriceCOV <- lm(log(price2020)~newcases*WHO_measures,Price2020)
+summary(LinRegPriceCOV)
+ggdensity(LinRegPriceCOV$residuals,
+main = "Residuals Plot",
+xlab = "Residuals")
+qqnorm(scale(LinRegPriceCOV$residuals))
+qqline(scale(LinRegPriceCOV$residuals))
+```
+```{r Demand: 2019}
+Demand19 <- subset(Demand, date >="2019-03-01" & date < "2019-11-01")
+Demand19 <- Demand19[Demand19$listing_id %in% idfilterAvail$id,]
+Demand19$Month <- format(as.Date(Demand19$date), "%m")
+Demand19 <- merge(subset(Listings, select=c("id", "host_is_superhost", "neighbourhood_cleansed",
+"room_type", "accommodates", "minimum_nights")),
+Demand19, by.x="id", by.y="listing_id")
+Demand19 <- Demand19 %>%
+group_by(id,Month, host_is_superhost, neighbourhood_cleansed, room_type, accommodates,
+minimum_nights) %>%
+count("id")
+Demand19 <- Demand19[, c(1:7,9)]
+
+#Factor Transformation
+Demand19$host_is_superhost <- as.factor(sapply(Demand19$host_is_superhost, as.numeric))
+Demand19$neighbourhood_cleansed <- factor(Demand19$neighbourhood_cleansed)
+Demand19$room_type <- factor(Demand19$room_type)
+Demand19$Month <- factor(Demand19$Month)
+Demand19 <- Demand19[,-1]
+Demand19$n <- Demand19$n*2
+
+#Linear Regression
+LinRegDemand2019 <- lm(log(n) ~., Demand19)
+summary(LinRegDemand2019)
+#Plot Residuals
+ggdensity(LinRegDemand2019$residuals, main = "Residuals Plot", xlab = "Residuals")
+qqnorm(scale(LinRegDemand2019$residuals))
+qqline(scale(LinRegDemand2019$residuals))
+```
+```{r 2020+Covid}
+Demand20 <- subset(Demand, date >="2020-03-01" & date < "2020-11-01")
+Demand20 <- Demand20[Demand20$listing_id %in% idfilterAvail$id,]
+Demand20 <- Demand20 %>%
+group_by(date) %>%
+count("listing_id")
+Demand20 <- Demand20[,c(1,3)]
+Demand20 <- merge(Demand20, cov, by="date")
+Demand20 <- Demand20 %>%
+mutate(WHO_measures = if_else(date >="2020-06-15" & date <"2020-08-18", 0, 1))
+Demand20$WHO_measures <- as.factor(Demand20$WHO_measures)
+Demand20$n <- Demand20$n*2
+LinRegDemandCOV <- lm(log(n)~newcases*WHO_measures,Demand20)
+summary(LinRegDemandCOV)
+ggdensity(LinRegDemandCOV$residuals, main = "Residuals Plot", xlab = "Residuals")
+qqnorm(scale(LinRegDemandCOV$residuals))
+qqline(scale(LinRegDemandCOV$residuals))
+```
+```{r Availability: 2020+COVID}
+#Data Prep
+AvailCOVID <- aggregate(available~date, calendar2020id,sum)
+AvailCOVID <- merge(AvailCOVID, cov, by="date")
+AvailCOVID <- AvailCOVID %>%
+mutate(WHO_measures = if_else(date >="2020-06-15" & date <"2020-08-18", 0, 1))
+
+#Linear Regression
+plot(AvailCOVID$date, AvailCOVID$available, type="l")
+LinRegAvailCOVID <- lm(log(available)~newcases*WHO_measures,AvailCOVID)
+summary(LinRegAvailCOVID)
+ggdensity(LinRegAvailCOVID$residuals, main = "Residuals Plot", xlab = "Residuals")
+qqnorm(scale(LinRegAvailCOVID$residuals))
+qqline(scale(LinRegAvailCOVID$residuals))
+```
+```{r Correlation}
+CorrMat <- merge(subset(AvailCOVID, select=c("date", "available")), subset(Demand20, select=c("date", "n")), by="date")
+CorrMat <- merge(CorrMat, subset(Price2020, select=c("date", "price2020")), by="date")
+CorrMat <- CorrMat[,2:4]
+colnames(CorrMat) <- c("Availability", "Demand", "Price")
+CorrMat$Demand <- as.numeric(CorrMat$Demand)
+CorrMat$Availability <- as.numeric(CorrMat$Availability)
+source("http://www.sthda.com/upload/rquery_cormat.r")
+
+rquery.cormat(CorrMat)
+```
+```{r Time Series: Preparation}
+#Price
+calendarTS$price <- as.numeric(gsub("\\$", "", calendarTS$price))
+calendarTS$Month <- format(as.Date(calendarTS$date), "%Y-%m")
+TSPrice <- aggregate(price~Month, calendarTS, mean)
+TSPrice <- TSPrice[,c("Month", "price")]
+TSPrice$Month <- as.Date(paste(TSPrice$Month,"-01", sep=""))
+
+#Availability
+TSAvailability <- Availability %>%
+group_by(Month) %>%
+summarise(Availability=mean(availability_30))
+
+#Create vector with the average availabilities
+TSAvailability$Month <- as.Date(paste(TSAvailability$Month,"-01", sep=""))
+
+#Demand
+TSDemand <- Demand %>%
+group_by(Month) %>%
+count("listing_id")
+TSDemand <- TSDemand[,c(1,3)]
+TSDemand$Month <- as.Date(paste(TSDemand$Month,"-01", sep=""))
+```
+```{r Visualization}
+#Price
+ggplot(TSPrice, aes(x=Month, y=price))+ geom_line()+ geom_smooth(method = "lm", se = FALSE)+ xlab("Month-Year")+ ylab("Price")+ scale_x_continuous("Month-Year", labels = as.character(TSPrice$Month), breaks = TSPrice$Month)+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#Demand
+ggplot(TSDemand, aes(x=Month, y=n))+ geom_line()+ geom_smooth(method = "lm", se = FALSE)+ xlab("Month-Year")+ ylab("Demand")+ scale_x_continuous("Month-Year", labels = as.character(TSDemand$Month), breaks = TSDemand$Month)+
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#Availability
+ggplot(TSAvailability, aes(x=Month, y=Availability))+ geom_line()+ geom_smooth(method = "lm", se = FALSE)+ xlab("Month-Year")+ ylab("Avail")+ scale_x_continuous("Month-Year", labels = as.character(TSAvailability$Month), breaks = TSAvailability$Month)+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+```{r TSAnalysis: ARIMA}
+#Vectors
+TSPriceVector <- ts(TSPrice[, "price"],start=c(2018,4), frequency=12)
+TSAvailVector <- ts(TSAvailability$Availability,frequency=12,start=c(2018,4))
+TSDemandVector <- ts(TSDemand$n,frequency=12,start=c(2018,4))
+plot(TSPriceVector)
+acf(TSPriceVector)
+adf.test(TSPriceVector)
+Price_Arima <- auto.arima(TSPriceVector, trace=T, stationary=T, test="adf")
+summary(Price_Arima)
+Price_Arima_Res <- resid(Price_Arima)
+checkresiduals(Price_Arima_Res, lag=3, df = 1, test=FALSE)
+Box.test(Price_Arima_Res, type="Ljung-Box", lag=3, fitdf = 1)
+forecastPrice <- forecast(Price_Arima, h=6)
+forecastPrice
+
+Price_Fcst_Arima <- ts(c(TSPriceVector, forecastPrice$mean), start=start(TSPriceVector), frequency=12)
+Price_Fcst_Arima <- cbind(Price_Fcst_Arima, upper=NA, lower=NA)
+Price_Fcst_Arima[32:37,"lower"] <- forecastPrice$lower[,2]
+Price_Fcst_Arima[32:37,"upper"] <- forecastPrice$upper[,2]
+matplot(Price_Fcst_Arima, type="l", col=c("blue", "red", "red"), lty=c(1,3,3), ylab="Price Forecast")
+plot(TSDemandVector)
+acf(TSDemandVector)
+adf.test(TSDemandVector)
+Demand_Arima <- auto.arima(TSDemandVector, trace=T, stationary=T, test="adf")
+summary(Demand_Arima)
+Demand_Arima_Res <- resid(Demand_Arima)
+Box.test(Demand_Arima_Res, type="Ljung-Box", lag=3, fitdf = 2)
+checkresiduals(Demand_Arima_Res, test=FALSE)
+forecastDemand <- forecast(Demand_Arima, h=6)
+forecastDemand
+
+Demand_Fcst_Arima <- ts(c(TSDemandVector, forecastDemand$mean), start=start(TSDemandVector), frequency=12)
+Demand_Fcst_Arima <- cbind(Demand_Fcst_Arima, upper=NA, lower=NA)
+Demand_Fcst_Arima[32:37,"lower"] <- forecastDemand$lower[,2]
+Demand_Fcst_Arima[32:37,"upper"] <- forecastDemand$upper[,2]
+matplot(Demand_Fcst_Arima, type="l", col=c("blue", "red", "red"), lty=c(1,3,3), ylab="Demand Forecast")
+plot(TSAvailVector)
+acf(TSAvailVector)
+adf.test(TSAvailVector)
+Avail_Arima <- auto.arima(TSAvailVector, trace=T, stationary=T, test="adf")
+summary(Avail_Arima)
+Avail_Arima_Res <- resid(Avail_Arima)
+Box.test(Avail_Arima_Res, type="Ljung-Box", lag=3, fitdf = 1)
+checkresiduals(Avail_Arima_Res, test=FALSE)
+forecastAvail <- forecast(Avail_Arima, h=6)
+forecastAvail
+
+Avail_Fcst_Arima <- ts(c(TSAvailVector, forecastAvail$mean), start=start(TSAvailVector), frequency=12)
+Avail_Fcst_Arima <- cbind(Avail_Fcst_Arima, upper=NA, lower=NA)
+Avail_Fcst_Arima[32:37,"lower"] <- forecastAvail$lower[,2]
+Avail_Fcst_Arima[32:37,"upper"] <- forecastAvail$upper[,2]
+matplot(Avail_Fcst_Arima, type="l", col=c("blue", "red", "red"), lty=c(1,3,3), ylab="Avail Forecast")
+```
+```{r: VAR}
+TSAnalysis <- cbind(TSPrice,TSAvailability, TSDemand)
+TSAnalysis <- TSAnalysis[,c(1:2,4,6)]
+colnames(TSAnalysis) <- c("Month", "Price", "Avail", "Demand")
+TSAnalysis <- TSAnalysis[,2:4]
+TSAnalysis <- ts(TSAnalysis,frequency=12,start=c(2018,4))
+plot(TSAnalysis)
+TSPriceVAR <- ur.df(TSAnalysis[,"Price"], type="trend")
+TSPriceVAR@cval
+TSPriceVAR@teststat
+TSAvailVAR <- ur.df(TSAnalysis[,"Avail"], type="trend")
+TSAvailVAR@cval
+TSAvailVAR@teststat
+TSDemandVAR <- ur.df(TSAnalysis[,"Demand"], type="trend")
+TSDemandVAR@cval
+TSDemandVAR@teststat
+ndiffs(TSAnalysis[,"Price"], test="adf")
+ndiffs(TSAnalysis[,"Demand"], test="adf")
+ndiffs(TSAnalysis[,"Avail"], test="adf")
+TSAnalysisDiff <- TSAnalysis[-1,]
+TSAnalysisDiff <- sapply(TSAnalysis, diff)
+VARselect(TSAnalysisDiff, type="both")
+TSAnalysisVAR <- VAR(TSAnalysisDiff, type="both", p=5)
+summary(TSAnalysisVAR)
+
+#Diagnostics
+roots(TSAnalysisVAR)
+serial.test(TSAnalysisVAR)
+normality.test(TSAnalysisVAR)
+TSAnalysis_IRF_DemandPrice <- irf(TSAnalysisVAR, impulse="Demand", response="Price", cumulative = T)
+TSAnalysis_IRF_DemandAvail <- irf(TSAnalysisVAR, impulse="Demand", response="Avail", cumulative = T)
+TSAnalysis_IRF_DemandDemand <- irf(TSAnalysisVAR, impulse="Demand", response="Demand")
+plot(TSAnalysis_IRF_DemandPrice)
+plot(TSAnalysis_IRF_DemandAvail)
+plot(TSAnalysis_IRF_DemandDemand)
+
+#Forecast
+TSAnalysisVARPred <- predict(TSAnalysisVAR)
+Price_Pred <- data.frame(TSAnalysisVARPred$fcst$Price)
+Price_Pred <- cumsum(Price_Pred)
+Price_Pred <- Price_Pred+as.numeric(TSAnalysis[31,"Price"])
+Price_Pred
+Avail_Pred <- data.frame(TSAnalysisVARPred$fcst$Avail)
+Avail_Pred <- cumsum(Avail_Pred)
+Avail_Pred <- Avail_Pred+as.numeric(TSAnalysis[31,"Avail"])
+Avail_Pred
+Demand_Pred <- data.frame(TSAnalysisVARPred$fcst$Demand)
+Demand_Pred <- cumsum(Demand_Pred)
+Demand_Pred <- Demand_Pred+as.numeric(TSAnalysis[31,"Demand"])
+Demand_Pred
+
+#Visuals
+Demand_Fcst <- ts(c(TSAnalysis[,"Demand"], Demand_Pred[,"fcst"]), start=start(TSAnalysis[,"Price"]), frequency=12)
+Demand_Fcst <- cbind(Demand_Fcst, upper=NA, lower=NA)
+Demand_Fcst[31:40,"lower"] <- Demand_Pred[,"lower"]
+Demand_Fcst[31:40,"upper"] <- Demand_Pred[,"upper"]
+matplot(Demand_Fcst, type="l", col=c("blue", "red", "red"), lty=c(1,3,3), ylab="Demand")
+Price_Fcst <- ts(c(TSAnalysis[,"Price"], Price_Pred[,"fcst"]), start=start(TSAnalysis[,"Price"]), frequency=12)
+Price_Fcst <- cbind(Price_Fcst, upper=NA, lower=NA)
+Price_Fcst[31:40,"lower"] <- Price_Pred[,"lower"]
+Price_Fcst[31:40,"upper"] <- Price_Pred[,"upper"]
+matplot(Price_Fcst, type="l", col=c("blue", "red", "red"), lty=c(1,3,3), ylab="Price")
+Avail_Fcst <- ts(c(TSAnalysis[,"Avail"], Avail_Pred[,"fcst"]), start=start(TSAnalysis[,"Avail"]), frequency=12)
+Avail_Fcst <- cbind(Avail_Fcst, upper=NA, lower=NA)
+Avail_Fcst[31:40,"lower"] <- Avail_Pred[,"lower"]
+Avail_Fcst[31:40,"upper"] <- Avail_Pred[,"upper"]
+matplot(Avail_Fcst, type="l", col=c("blue", "red", "red"), lty=c(1,3,3),ylab="Availability")
+
+#clean work environment
+```{r}
+#rm(list = ls())
+``
