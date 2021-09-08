@@ -46,6 +46,7 @@ A relationship between price and
 4. the number of people it accommodates,
 5. minimum nights, and 
 6. Months 
+
 was established.
 
 ## Calculating demand
